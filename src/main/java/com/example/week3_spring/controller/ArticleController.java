@@ -36,9 +36,8 @@ public class ArticleController {
 
     //저장
     @PostMapping("/api/saveArticle")
-    public ResponseEntity<?> saveArticle(@RequestBody ArticleReqDto articleReqDto){
-        articleServiceInterface.savaArticle(articleReqDto);
-        return ResponseEntity.ok().body(null);
+    public ResponseEntity<Long> saveArticle(@RequestBody ArticleReqDto articleReqDto){
+        return ResponseEntity.ok().body(articleServiceInterface.savaArticle(articleReqDto));
     }
 
     //수정

@@ -15,7 +15,7 @@ public interface ArticleServiceInterface {
     public ArticleResDto findById(Long id);
 
     //등록
-    public void savaArticle(ArticleReqDto articleReqDto);
+    public Long savaArticle(ArticleReqDto articleReqDto);
 
     //수정
     public Long updateArticle(Long id,ArticleReqDto articleReqDto);

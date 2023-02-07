@@ -37,11 +37,11 @@ public class ArticleService implements ArticleServiceInterface{
     }
 
     //등록
-    public void savaArticle(ArticleReqDto articleReqDto) {
+    public Long savaArticle(ArticleReqDto articleReqDto) {
         //바꾸기 -> Article
         Article article = articleRepository.save(articleReqDto.articleReqDtoToArticle());
         System.out.println(article.getId());
-//        return article.getId();
+        return article.getId();
     }
 
     //수정

@@ -34,12 +34,12 @@ public class ArticleServiceMybatis implements ArticleServiceInterface{
 
     //등록
     @Override
-    public void savaArticle(ArticleReqDto articleReqDto) {
+    public Long savaArticle(ArticleReqDto articleReqDto) {
         Article article = articleReqDto.articleReqDtoToArticle();
 
         articleRepositoryMybatis.save(article);
 
-//        return article.getId();
+        return article.getId();
     }
 
     //수정
