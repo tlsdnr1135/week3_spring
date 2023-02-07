@@ -10,6 +10,12 @@ import static java.time.LocalDateTime.now;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(Exception.class)
+    public void adssad(Exception e){
+        System.out.println(e);
+        System.out.println("sdsdsdssdssdsdds");
+    }
+
     @ExceptionHandler(value = {CustomException.class})
     protected ResponseEntity<HttpResponse> handleCustomException(CustomException e){
         System.out.println("handleCustomException 안 = " + e);

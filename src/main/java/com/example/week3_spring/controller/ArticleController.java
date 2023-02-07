@@ -43,14 +43,15 @@ public class ArticleController {
 
     //전체 조회
     @GetMapping("/api/findAll")
-    public ResponseEntity<ArticleObject> findAll(){
-        return ResponseEntity.ok().body(articleServiceInterface.findAll());
+    public ResponseEntity<HttpResponse> findAll() throws CustomException{
+        return HttpResponse.toDataHttpResponse(new DataResponseCode(SUCCESS,articleServiceInterface.findAll()));
     }
 
     //상세 조회
     @GetMapping("/api/findById/{id}")
-    public ResponseEntity<ArticleResDto> findById(@PathVariable Long id){
-        return ResponseEntity.ok().body(articleServiceInterface.findById(id));
+    public ResponseEntity<HttpResponse> findById(@PathVariable Long id){
+        System.out.println("Sdds");
+        return HttpResponse.toDataHttpResponse(new DataResponseCode(SUCCESS,articleServiceInterface.findById(id)));
     }
 
     //저장
@@ -69,19 +70,20 @@ public class ArticleController {
 
     //수정
     @PutMapping("/api/updateArticle/{id}")
-    public ResponseEntity<Long> updateArticle(@PathVariable Long id,@Validated @RequestBody ArticleReqDto articleReqDto, Errors errors){
+    public ResponseEntity<HttpResponse> updateArticle(@PathVariable Long id,@Validated @RequestBody ArticleReqDto articleReqDto, Errors errors){
         if(errors.hasErrors()){
             System.out.println(errors.getFieldError().getDefaultMessage());
             System.out.println(errors.getFieldError());
+            return HttpResponse.toHttpResponse(INVALID_FAIL);
         }
-        return ResponseEntity.ok().body(articleServiceInterface.updateArticle(id, articleReqDto));
 
+        return HttpResponse.toDataHttpResponse(new DataResponseCode(SUCCESS,articleServiceInterface.updateArticle(id, articleReqDto)));
     }
 
     //삭제
     @DeleteMapping("/api/deleteArticle/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id){
         articleServiceInterface.deleteById(id);
-        return ResponseEntity.ok().body("성공적으로 삭제.");
+        return HttpResponse.toHttpResponse(SUCCESS);
     }
 }

@@ -57,7 +57,7 @@ public class ArticleService implements ArticleServiceInterface{
     public Long savaArticle(ArticleReqDto articleReqDto) {
         //바꾸기, dto -> Article
         Article article = articleReqDto.articleReqDtoToArticle();
-        //전환율
+        //전환율 계산.
         article.makeswitchCount();
 
         return articleRepository.save(article).getId();
