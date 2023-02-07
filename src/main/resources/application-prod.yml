@@ -11,8 +11,8 @@ spring:
       enabled: true
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/test
-    username: root
+    url: jdbc:h2:tcp://localhost/~/week3
+    username: sa
     password:
   jpa:
     show-sql: true

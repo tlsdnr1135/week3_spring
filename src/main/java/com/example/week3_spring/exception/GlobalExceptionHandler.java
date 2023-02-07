@@ -8,7 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import static java.time.LocalDateTime.now;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public void adssad(Exception e){
