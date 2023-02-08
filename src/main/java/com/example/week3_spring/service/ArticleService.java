@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.week3_spring.exception.ResponseCode.INVALID_ARTICLE;
-import static com.example.week3_spring.exception.ResponseCode.SUCCESS;
+import static com.example.week3_spring.exception.ResponseCode.*;
 
 @Service
 @Transactional
@@ -34,10 +33,10 @@ public class ArticleService implements ArticleServiceInterface{
     //전체 조회
     public ArticleObject findAll() {
         List<Article> articleList = articleRepository.findAll();
+
+        //찾은 리스트Article를 -> 오브젝트로 반환하기 위해 -> 그럴 이유 있나 HttpResponse잇는데
         ArticleObject articleObjects = new ArticleObject();
-
         articleObjects.setDataSulbin(articleList);
-
 
         return articleObjects;
     }
@@ -48,8 +47,7 @@ public class ArticleService implements ArticleServiceInterface{
                 () -> new CustomException(INVALID_ARTICLE)
         );
 
-        //Entity -> Article
-
+        //Entity -> Dto
         return article.ArticleToarticleResDto();
     }
 
@@ -67,17 +65,21 @@ public class ArticleService implements ArticleServiceInterface{
     public Long updateArticle(Long id,ArticleReqDto articleReqDto) {
         //아이디 찾기
         Article article = articleRepository.findById(id).orElseThrow(
-                ()->new IllegalArgumentException("해당하는 아이디가 없습니다.")
+                ()->new CustomException(INVALID_ARTICLE)
         );
 
-        article.changeArticle(articleReqDto);
-        article.makeswitchCount();
+        article.changeArticle(articleReqDto); //수정하기
+        article.makeswitchCount(); //전환율 계산
 
         return article.getId();
     }
 
     //삭제
     public void deleteById(Long id) {
+        //아이디 찾기
+        if(!articleRepository.existsById(id)){
+            new CustomException(INVALID_ARTICLE);
+        }
         articleRepository.deleteById(id);
     }
 

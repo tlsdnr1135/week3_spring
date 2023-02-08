@@ -21,7 +21,8 @@ public class ArticleReqDtoValidator implements Validator {
     @Override
     public void validate(Object object, Errors errors) {
         ArticleReqDto articleReqDto = (ArticleReqDto)object;
-//
+        System.out.println("벨리데이트안");
+//        
 //        if(articleRepository.findById(articleReqDto.get))
 
     }

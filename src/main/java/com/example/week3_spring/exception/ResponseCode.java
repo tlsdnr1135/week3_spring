@@ -14,8 +14,12 @@ public enum ResponseCode implements Serializable {
 
     //400
     INVALID_ARTICLE(NOT_FOUND,"해당하는 게시글이 없습니다."),
+//    NOTEXIST_ARTICLE(NOT_FOUND,"해당하는 게시글이 없습니다."),
+//    NOTFOUND_ID(BAD_REQUEST,"해당하는 아이디가 없습니다."),
 
     INVALID_FAIL(BAD_REQUEST,"형식이 잘못되었습니다.");
+
+
 
 
     private HttpStatus httpStatus;

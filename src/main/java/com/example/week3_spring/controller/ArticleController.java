@@ -9,9 +9,11 @@ import com.example.week3_spring.exception.CustomException;
 import com.example.week3_spring.exception.DataResponseCode;
 import com.example.week3_spring.exception.HttpResponse;
 import com.example.week3_spring.repository.ArticleRepository;
+import com.example.week3_spring.repository.BoardRepository;
 import com.example.week3_spring.service.ArticleService;
 import com.example.week3_spring.service.ArticleServiceInterface;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
@@ -28,10 +30,12 @@ public class ArticleController {
 
     private final ArticleServiceInterface articleServiceInterface;
     private final ArticleReqDtoValidator articleReqDtoValidator;
+    private final BoardRepository boardRepository;
 
-    public ArticleController(ArticleService service, ArticleReqDtoValidator articleReqDtoValidator) {
+    public ArticleController(ArticleService service, ArticleReqDtoValidator articleReqDtoValidator, BoardRepository boardRepository) {
         this.articleServiceInterface = service;
         this.articleReqDtoValidator = articleReqDtoValidator;
+        this.boardRepository = boardRepository;
     }
 
 //    @InitBinder("articleReqDto")
@@ -44,24 +48,22 @@ public class ArticleController {
     //전체 조회
     @GetMapping("/api/findAll")
     public ResponseEntity<HttpResponse> findAll() throws CustomException{
+        boardRepository.findAll();
+        System.out.println("안이얌");
         return HttpResponse.toDataHttpResponse(new DataResponseCode(SUCCESS,articleServiceInterface.findAll()));
     }
 
     //상세 조회
     @GetMapping("/api/findById/{id}")
     public ResponseEntity<HttpResponse> findById(@PathVariable Long id){
-        System.out.println("Sdds");
         return HttpResponse.toDataHttpResponse(new DataResponseCode(SUCCESS,articleServiceInterface.findById(id)));
     }
 
     //저장
     @PostMapping("/api/saveArticle")
     public ResponseEntity<HttpResponse> saveArticle(@Validated @RequestBody ArticleReqDto articleReqDto, Errors errors){
-
         //타입 맞지 않을 경우
         if(errors.hasErrors()){
-            System.out.println(errors.getFieldError().getDefaultMessage());
-            System.out.println(errors.getFieldError());
             return HttpResponse.toHttpResponse(INVALID_FAIL);
         }
 
@@ -71,11 +73,11 @@ public class ArticleController {
     //수정
     @PutMapping("/api/updateArticle/{id}")
     public ResponseEntity<HttpResponse> updateArticle(@PathVariable Long id,@Validated @RequestBody ArticleReqDto articleReqDto, Errors errors){
+        //타입 맞지 않을 경우
         if(errors.hasErrors()){
-            System.out.println(errors.getFieldError().getDefaultMessage());
-            System.out.println(errors.getFieldError());
             return HttpResponse.toHttpResponse(INVALID_FAIL);
         }
+
 
         return HttpResponse.toDataHttpResponse(new DataResponseCode(SUCCESS,articleServiceInterface.updateArticle(id, articleReqDto)));
     }
