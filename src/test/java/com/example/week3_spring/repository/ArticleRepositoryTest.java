@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 
 @DataJpaTest
@@ -29,36 +31,73 @@ class ArticleRepositoryTest {
         articleRepository.deleteAll();
     }
 
+    //두개를 항상 넣음 -> 사이즈 체크 -> 2개 이상이면 통과
+    //전체조회는 어떤식으로 검증을 할까...?
     @Test
     @DisplayName("전체 조회 테스트")
     public void findAll() {
         //given
+        Article article1 = Article.builder()
+                .date("2023/02/01")
+                .showCount(12L)
+                .clickCount(13L)
+                .adMoney(15L)
+                .soldMoney(16L)
+                .soldCount(17L)
+                .build();
+        Article article2 = Article.builder()
+                .date("2023/02/01")
+                .showCount(12L)
+                .clickCount(13L)
+                .adMoney(15L)
+                .soldMoney(16L)
+                .soldCount(17L)
+                .build();
+        articleRepository.save(article1);
+        articleRepository.save(article2);
 
         //when
         List<Article> articleList = articleRepository.findAll();
 
         //then
-//        assertEquals(articleList.size(),0);//예상값 ,실제값
+        assertTrue(articleList.size()>=2);
     }
-    //전체조회는 어떤식으로 검증을 할까...?
-    //디비가 달라져도 작동하게
+
 
     @Test
-    @DisplayName("단일 조회 테스트")
-    public void findById() {
+    @DisplayName("단일 조회 테스트_값이 있을 때")
+    public void findById_Success() {
         //given
-        Long id = 1L;
+        Article article = Article.builder()
+                .date("2023/02/01")
+                .showCount(12L)
+                .clickCount(13L)
+                .adMoney(15L)
+                .soldMoney(16L)
+                .soldCount(17L)
+                .build();
+
+        Long id = articleRepository.save(article).getId();
 
         //when
-        Optional<Article> article = articleRepository.findById(id); //아이디 있는지 확인.
+        Optional<Article> articleOP = articleRepository.findById(id); //아이디 있는지 확인.
 
         //then
-        if(article.isPresent()){
-            assertEquals(1L,article.get().getId());
-        }else{
-            assertTrue(article.isEmpty());
-        }
+        assertEquals(id,articleOP.get().getId());
     }
+//    @Test
+//    @DisplayName("단일 조회 테스트_값이 없을 때")
+//    public void findById_Fail() {
+//        //given
+//        Long id = articleRepository.findById();
+//
+//        //when
+//        Optional<Article> articleOP = articleRepository.findById(id); //아이디 있는지 확인.
+//
+//        //then
+//        assertTrue(article.isEmpty());
+//
+//    }
 
     @Test
     @DisplayName("저장 테스트")

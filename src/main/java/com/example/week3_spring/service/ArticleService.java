@@ -78,7 +78,8 @@ public class ArticleService implements ArticleServiceInterface{
     public void deleteById(Long id) {
         //아이디 찾기
         if(!articleRepository.existsById(id)){
-            new CustomException(INVALID_ARTICLE);
+            System.out.println("SDdsdsdsddssdsdsd");
+            throw new CustomException(INVALID_ARTICLE);
         }
         articleRepository.deleteById(id);
     }

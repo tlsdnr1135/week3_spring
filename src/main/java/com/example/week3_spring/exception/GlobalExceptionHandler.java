@@ -11,18 +11,18 @@ import static java.time.LocalDateTime.now;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    @ExceptionHandler(value = {CustomException.class})
+    protected ResponseEntity<HttpResponse> handleCustomException(CustomException e){
+        System.out.println("handleCustomException");
+        return HttpResponse.toHttpResponse(e.getResponseCode());
+    }
     //이건 왜 아래에서 안잡힘?
     @ExceptionHandler(Exception.class)
     public ResponseEntity<HttpResponse> itgException(Exception e){
         System.out.println("itgException");
         //여기서 그냥 강제로 줘야할듯... 하드코딩으로
         return HttpResponse.toItgHttpResponse(e);
-    }
-
-    @ExceptionHandler(value = {CustomException.class})
-    protected ResponseEntity<HttpResponse> handleCustomException(CustomException e){
-        System.out.println("handleCustomException");
-        return HttpResponse.toHttpResponse(e.getResponseCode());
     }
 
     //RunException 종류 별로 나눠야 하나?
