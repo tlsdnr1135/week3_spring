@@ -31,14 +31,14 @@ public class ArticleService implements ArticleServiceInterface{
 
 
     //전체 조회
-    public ArticleObject findAll() {
+    public List<Article> findAll() {
         List<Article> articleList = articleRepository.findAll();
 
         //찾은 리스트Article를 -> 오브젝트로 반환하기 위해 -> 그럴 이유 있나 HttpResponse잇는데
-        ArticleObject articleObjects = new ArticleObject();
-        articleObjects.setDataSulbin(articleList);
+//        ArticleObject articleObjects = new ArticleObject();
+//        articleObjects.setDataSulbin(articleList);
 
-        return articleObjects;
+        return articleList;
     }
 
     //상세 조회

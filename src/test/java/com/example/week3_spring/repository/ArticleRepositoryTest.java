@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
+import  static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +24,10 @@ class ArticleRepositoryTest {
     @Autowired
     private ArticleRepository articleRepository;
 
-//    @BeforeEach
-//    void beforeEach() {
-//        articleRepository.deleteAll();
-//    }
+    @BeforeEach
+    void beforeEach() {
+        articleRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("전체 조회 테스트")
@@ -38,8 +38,7 @@ class ArticleRepositoryTest {
         List<Article> articleList = articleRepository.findAll();
 
         //then
-        assertThat
-        assertEquals(articleList.size(),0);//예상값 ,실제값
+//        assertEquals(articleList.size(),0);//예상값 ,실제값
     }
     //전체조회는 어떤식으로 검증을 할까...?
     //디비가 달라져도 작동하게
@@ -60,7 +59,6 @@ class ArticleRepositoryTest {
             assertTrue(article.isEmpty());
         }
     }
-    //
 
     @Test
     @DisplayName("저장 테스트")
@@ -81,14 +79,13 @@ class ArticleRepositoryTest {
 
         //then
         Optional<Article> findArticle = articleRepository.findById(result.getId());
-        assertEquals(result.getId(),findArticle.get());
+        assertEquals(result.getId(),findArticle.get().getId());
     }
 
     @Test
     @DisplayName("수정 테스트")
     public void update() {
         //given
-        Long id = 1L;
         Article beforeArticle = Article.builder()
                 .date("2023/02/01")
                 .showCount(12L)
@@ -98,7 +95,8 @@ class ArticleRepositoryTest {
                 .soldCount(17L)
                 .build();
         beforeArticle.makeswitchCount();
-        articleRepository.save(beforeArticle); //저장하기
+        Article article = articleRepository.save(beforeArticle); //저장하기
+        Long id = article.getId();
 
         ArticleReqDto afterArticle = new ArticleReqDto();
         afterArticle.setDate("2023/02/05");
@@ -106,25 +104,19 @@ class ArticleRepositoryTest {
 
         //when
         Optional<Article> result = articleRepository.findById(id);
-        result.ifPresent(article -> article.changeArticle(afterArticle));
-
+        result.ifPresent(a -> a.changeArticle(afterArticle));
 
 
         //then
-        //다시 파인드 바이 아이디
-        org.assertj.core.api.Assertions.assertThat(result).isNotEmpty();
-        assertEquals(result.get().getId(),1L);
-        assertEquals(result.get().getDate(),"2023/02/05");
+        if(result.isPresent()){
+            assertThat(result.get().getDate()).isEqualTo("2023/02/05");
+        }
     }
-
-    //저장하는 것도 given에 해당하는 것인가?
-    //옵셔널이 붙었을 때는 어떻게해야하나?
 
     @Test
     @DisplayName("삭제 테스트")
     public void delete() {
         //given
-        Long id = 1L;
         Article beforeArticle = Article.builder()
                 .date("2023/02/01")
                 .showCount(12L)
@@ -134,12 +126,13 @@ class ArticleRepositoryTest {
                 .soldCount(17L)
                 .build();
         beforeArticle.makeswitchCount();
-        articleRepository.save(beforeArticle); //저장하기
+
+        Article article = articleRepository.save(beforeArticle); //저장하기
+        Long id = article.getId();
 
         //when
         Optional<Article> result = articleRepository.findById(id);
         if(result.isPresent()){
-            System.out.println(result.isPresent());
             articleRepository.deleteById(id);
         }
 

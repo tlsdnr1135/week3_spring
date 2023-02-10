@@ -13,7 +13,7 @@ import java.util.List;
 public interface ArticleServiceInterface {
 
     //전체 조회
-    public ArticleObject findAll();
+    public List<Article> findAll();
 
     //상세 조회
     public ArticleResDto findById(Long id);
