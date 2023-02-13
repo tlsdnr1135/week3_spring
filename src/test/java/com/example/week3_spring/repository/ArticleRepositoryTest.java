@@ -34,10 +34,13 @@ class ArticleRepositoryTest {
     //두개를 항상 넣음 -> 사이즈 체크 -> 2개 이상이면 통과
     //전체조회는 어떤식으로 검증을 할까...?
     @Test
-    @DisplayName("전체 조회 테스트")
+    @DisplayName("전체_조회_테스트")
     public void findAll() {
         //given
-        Article article1 = Article.builder()
+        //처음 사이즈를 구해놓는다. -> 나중에 비교
+        int size = articleRepository.findAll().size();
+
+                Article article1 = Article.builder()
                 .date("2023/02/01")
                 .showCount(12L)
                 .clickCount(13L)
@@ -60,10 +63,11 @@ class ArticleRepositoryTest {
         List<Article> articleList = articleRepository.findAll();
 
         //then
-        assertTrue(articleList.size()>=2);
+        assertTrue(articleList.size()==2+size);
     }
 
 
+    //값을 저장 -> 저장한 아이디로 있는지 확인.
     @Test
     @DisplayName("단일 조회 테스트_값이 있을 때")
     public void findById_Success() {
@@ -85,20 +89,8 @@ class ArticleRepositoryTest {
         //then
         assertEquals(id,articleOP.get().getId());
     }
-//    @Test
-//    @DisplayName("단일 조회 테스트_값이 없을 때")
-//    public void findById_Fail() {
-//        //given
-//        Long id = articleRepository.findById();
-//
-//        //when
-//        Optional<Article> articleOP = articleRepository.findById(id); //아이디 있는지 확인.
-//
-//        //then
-//        assertTrue(article.isEmpty());
-//
-//    }
 
+    //단일 조회 테스트랑 비슷.
     @Test
     @DisplayName("저장 테스트")
     public void save() {
@@ -121,6 +113,7 @@ class ArticleRepositoryTest {
         assertEquals(result.getId(),findArticle.get().getId());
     }
 
+    //저장-> 디티오 생성 -> 바꿔줌 -> 값이 바뀌었는지 확인.
     @Test
     @DisplayName("수정 테스트")
     public void update() {
@@ -152,6 +145,7 @@ class ArticleRepositoryTest {
         }
     }
 
+    //저장 -> 아이디가 있으면 삭제 -> 삭제한 아이디 불러와서 비었는지 확인.
     @Test
     @DisplayName("삭제 테스트")
     public void delete() {
@@ -170,10 +164,10 @@ class ArticleRepositoryTest {
         Long id = article.getId();
 
         //when
-        Optional<Article> result = articleRepository.findById(id);
-        if(result.isPresent()){
-            articleRepository.deleteById(id);
-        }
+        Optional<Article> result = articleRepository.findById(id); //여기서 존재 하는지 검증.
+        assertTrue(articleRepository.findById(result.get().getId()).isPresent());
+
+        articleRepository.deleteById(id);
 
         //then
         assertTrue(articleRepository.findById(id).isEmpty());

@@ -3,7 +3,10 @@ package com.example.week3_spring.service;
 import com.example.week3_spring.domain.Article;
 import com.example.week3_spring.domain.ArticleReqDto;
 import com.example.week3_spring.domain.ArticleResDto;
+import com.example.week3_spring.exception.CustomException;
 import com.example.week3_spring.repository.ArticleRepository;
+import org.apache.ibatis.jdbc.Null;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.InstanceOfAssertFactories.OPTIONAL;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,12 +80,11 @@ class ArticleServiceTest {
     }
 
     @Test
-    @DisplayName("단일 조회")
+    @DisplayName("단일_조회_성공")
     void findById() {
         //given
         Long id = 1L; //파라미터
 
-        //stub
         Article article = Article.builder()
                 .id(1L)
                 .date("2023/02/02")
@@ -92,6 +95,8 @@ class ArticleServiceTest {
                 .soldCount(117L)
                 .build();
         Optional<Article> ArticleOP = Optional.of(article);
+
+        //stub
         when(articleRepository.findById(1L)).thenReturn(ArticleOP);
 
         //when
@@ -100,6 +105,26 @@ class ArticleServiceTest {
 
         //then
         assertThat(dto.getDate()).isEqualTo("2023/02/02");
+    }
+
+    @Test
+    @DisplayName("단일_조회_예외처리")
+    void findById_Exception() throws Exception{
+        //given
+        Long id = 1L; //파라미터
+
+
+        //stub
+        when(articleRepository.findById(1L)).thenReturn(Optional.empty());
+
+        //when
+
+
+        //then
+        Assertions.assertThrows(CustomException.class, () -> {
+            articleService.findById(id); //when
+        });
+
     }
 
     @Test
@@ -134,12 +159,12 @@ class ArticleServiceTest {
 
         //then
         assertThat(result).isEqualTo(1L);
-
+        //entity나 dto에 있는 값들을 검증이 힘듬.
     }
 
     @Test
-    @DisplayName("수정 테스트")
-    void updateArticle() {
+    @DisplayName("수정_테스트_성공")
+    void updateArticle_SUCESS() {
         //given
         Long id = 1L; //파라미터로 받음
 
@@ -174,20 +199,58 @@ class ArticleServiceTest {
         assertThat(afterId).isEqualTo(1L);
 
     }
+    @Test
+    @DisplayName("수정_테스트_예외처리_아이디값_없음")
+    void updateArticle_NULL_ID() {
+        //given
+        Long id = 1L; //파라미터로 받음
+
+        ArticleReqDto articleReqDto = new ArticleReqDto(); //파라미터로 받음
+
+        Article article = new Article();
+        Optional<Article> a = Optional.of(article);
+
+        //stub
+        when(articleRepository.findById(id)).thenReturn(Optional.empty());
+
+        //when
+
+        //then
+        Assertions.assertThrows(CustomException.class, () -> {
+            articleService.findById(id); //when
+        });
+
+    }
 
     @Test
-    @DisplayName("삭제 테스트")
-    void deleteById() {
+    @DisplayName("삭제_테스트_성공")
+    void deleteById_SUCCESS() {
         //given
 
         //stub
         when(articleRepository.existsById(any())).thenReturn(true);
-//        when(articleRepository.deleteById()).thenReturn();
 
         //when
         articleService.deleteById(21L);
 
         //then
         verify(articleRepository,atLeastOnce()).deleteById(21L);
+    }
+
+    @Test
+    @DisplayName("삭제_테스트_예외처리_아이디_존재_안함")
+    void deleteById_NULL_ID() {
+        //given
+
+        //stub
+        when(articleRepository.existsById(any())).thenReturn(false);
+
+        //when
+
+
+        //then
+        Assertions.assertThrows(CustomException.class, () -> {
+            articleService.deleteById(any()); //when
+        });
     }
 }

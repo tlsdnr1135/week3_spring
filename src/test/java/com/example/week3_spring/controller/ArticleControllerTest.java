@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -47,6 +48,8 @@ class ArticleControllerTest {
     private ObjectMapper objectMapper;
 
 
+    
+    //파라미터 라이즈드?추가하기
     @Test
     @DisplayName("전체 조회 테스트")
     void findAll() throws Exception{
@@ -59,19 +62,28 @@ class ArticleControllerTest {
     }
 
     @Test
-    @DisplayName("상세 조회 테스트")
-    void findById() throws Exception{
+    @DisplayName("상세_조회_테스트_성공")
+    void findById_SUCESS() throws Exception{
         String str = "$.[?(@.message == '%s')]";
 
         mockMvc.perform(get("/api/findById/{id}",1L))
-                .andExpect(status().is(404))
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath(str,"해당하는 게시글이 없습니다.").exists());
 
     }
+    @Test
+    @DisplayName("상세_조회_테스트_예외처리_파라미터_오류")
+    void findById_ID_ERROR() throws Exception{
+        String str = "$.[?(@.response == '%s')]";
+
+        mockMvc.perform(get("/api/findById/{id}","ㅁㄴㅇ"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath(str,"Bad Request").exists());
+    }
 
     @Test
-    @DisplayName("저장 테스트")
-    void saveArticle() throws Exception{
+    @DisplayName("저장_테스트_성공")
+    void saveArticle_SUCCESS() throws Exception{
         String str = "$.[?(@.message == '%s')]";
         String str2 = "$.[?(@.data == '%d')]";
 //        String date = "$..data[?(@.date == '%s')]";
@@ -89,9 +101,32 @@ class ArticleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(articleReqDto))
                 )
-                .andExpect(status().is(200))
+                .andExpect(status().isOk()) //바꾸기
                 .andExpect(jsonPath(str,"성공").exists())
                 .andExpect(jsonPath("$.data").isNumber());
+    }
+    @Test
+    @DisplayName("저장_테스트_예외처리_파라미터_DTO_오류")
+    void saveArticle_DTO_ERROR() throws Exception{
+        String str = "$.[?(@.message == '%s')]";
+        String str2 = "$.[?(@.data == '%d')]";
+//        String date = "$..data[?(@.date == '%s')]";
+
+        ArticleReqDto articleReqDto = new ArticleReqDto();
+        articleReqDto.setDate("2023/02/02");
+        articleReqDto.setShowCount(null);
+        articleReqDto.setClickCount(11L);
+        articleReqDto.setAdMoney(11L);
+        articleReqDto.setSoldMoney(11L);
+        articleReqDto.setSoldCount(11L);
+
+
+        mockMvc.perform(post("/api/saveArticle")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(articleReqDto))
+                )
+                .andExpect(status().is4xxClientError()) //바꾸기
+                .andExpect(jsonPath(str,"형식이 잘못되었습니다.").exists());
     }
 
     @Test
@@ -150,14 +185,37 @@ class ArticleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(articleToDto))
                 )
-                .andExpect(status().is(200))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath(str,"성공").exists())
                 .andExpect(jsonPath(str2,articleId).exists());
     }
 
     @Test
-    @DisplayName("삭제 테스트")
-    void deleteById() throws Exception{
+    @DisplayName("수정_테스트_예외처리_DTO")
+    void updateArticle_DTO_ERROR() throws Exception{
+        String str = "$.[?(@.message == '%s')]";
+        String str2 = "$.[?(@.data == '%d')]";
+        String date = "$..data[?(@.date == '%s')]";
+
+        ArticleReqDto articleReqDto = new ArticleReqDto();
+        articleReqDto.setDate("2023/02/05");
+        articleReqDto.setShowCount(null);
+        articleReqDto.setClickCount(11L);
+        articleReqDto.setAdMoney(11L);
+        articleReqDto.setSoldMoney(11L);
+        articleReqDto.setSoldCount(11L);
+
+        mockMvc.perform(put("/api/updateArticle/{id}",1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(articleReqDto))
+                )
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath(str,"형식이 잘못되었습니다.").exists());
+    }
+
+    @Test
+    @DisplayName("삭제_테스트_성공")
+    void deleteById_SUCCESS() throws Exception{
         String str = "$.[?(@.message == '%s')]";
         String str2 = "$.[?(@.data == '%d')]";
 
@@ -175,7 +233,16 @@ class ArticleControllerTest {
 
 
         mockMvc.perform(delete("/api/deleteArticle/{id}",articleId))
-                .andExpect(status().is(200))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath(str,"성공").exists());
+    }
+    @Test
+    @DisplayName("삭제_테스트_오류처리")
+    void deleteById() throws Exception{
+        String str = "$.[?(@.response == '%s')]";
+
+        mockMvc.perform(delete("/api/deleteArticle/{id}","ㅁㄴㅇ"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath(str,"Bad Request").exists());
     }
 }
